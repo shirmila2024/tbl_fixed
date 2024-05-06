@@ -10,6 +10,26 @@
     $product = $products[0];
     $product2 = $products[1];
 
+    session_start(); 
+    
+    function generateCsrfToken() {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+    }
+    
+    function verifyCsrfToken($token) {
+        return $token === $_SESSION['csrf_token'];
+    }
+    
+    // Generate a new CSRF token if one isn't already set
+    generateCsrfToken();
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (!verifyCsrfToken($_POST['csrf_token'])) {
+            die('CSRF token validation failed');
+        }
+    }
 ?>
 
 <!DOCTYPE html>
